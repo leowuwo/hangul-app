@@ -562,7 +562,13 @@
       }
       if (item.img) {
         var sz = isLarge ? largeSize : 116;
-        return '<img src="' + item.img + '" alt="' + item.word + '" style="width:' + sz + 'px;height:' + sz + 'px;object-fit:contain;border-radius:18px;">';
+        var fallback = (item.cat === 'carbot' || item.cat === 'pokemon')
+          ? 'data:image/svg+xml;utf8,' + encodeURIComponent(createCharacterSVG(item, sz))
+          : '';
+        var onErr = fallback
+          ? "this.onerror=null;this.src='" + fallback + "';"
+          : "this.onerror=null;this.outerHTML='<div class=\"word-emoji\">' + " + JSON.stringify(item.emoji || '✨') + " + '</div>';";
+        return '<img src="' + item.img + '" alt="' + item.word + '" loading="lazy" onerror="' + onErr + '" style="width:' + sz + 'px;height:' + sz + 'px;object-fit:contain;border-radius:18px;">';
       }
       if (item.cat === 'carbot' || item.cat === 'pokemon') {
         return createCharacterSVG(item, isLarge ? largeSize : 116);
