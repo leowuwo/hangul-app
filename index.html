@@ -43,10 +43,10 @@
     .solo-view { background: #fff; border: 3px solid #FFD166; border-radius: 22px; padding: 16px; text-align: center; box-shadow: 0 6px 15px rgba(0,0,0,0.08); flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .solo-big-char { font-size: clamp(4.5rem, 16vh, 7.5rem); line-height: 1.1; color: #FF7A00; margin: 6px 0; }
     .solo-sub { font-size: 1.35rem; color: #555; margin-bottom: 12px; }
-    .solo-art { height: clamp(160px, 34vh, 280px); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
-    .solo-art .word-emoji { font-size: clamp(6rem, 22vh, 11rem); line-height: 1; }
-    .solo-art svg, .solo-art img { max-height: 100%; max-width: 75vw; width: auto !important; height: 100% !important; object-fit: contain; }
-    .solo-word { font-size: clamp(2rem, 6vh, 3.2rem); line-height: 1.15; color: #E06000; margin-bottom: 12px; }
+    .solo-art { height: clamp(240px, 46vh, 420px); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+    .solo-art .word-emoji { font-size: clamp(9rem, 33vh, 16.5rem); line-height: 1; }
+    .solo-art svg, .solo-art img { max-height: 100%; max-width: 82vw; width: auto !important; height: 100% !important; object-fit: contain; }
+    .solo-word { font-size: clamp(4rem, 12vh, 6.4rem); line-height: 1.15; color: #E06000; margin-bottom: 12px; word-break: keep-all; }
 
     /* 2. 글자 조합 (글자 크기 약 2배 확대 및 컴팩트 카드 배치) */
     .combiner-box { background: #fff; border-radius: 22px; padding: 14px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 2px solid #FFE082; display: flex; flex-direction: column; gap: 10px; }
@@ -259,7 +259,7 @@
       <div id="extraSoloView" class="solo-view" style="display:none;">
         <div class="back-bar" style="width:100%;"><button type="button" class="back-btn" onclick="closeExtraSolo()">← 목록으로</button></div>
         <div class="solo-sub" id="soloExtraBadge" style="background:#FFF2D6; padding:4px 14px; border-radius:14px; font-size:1rem;">짧은 문장</div>
-        <div class="solo-word" id="soloExtraText" style="font-size: clamp(1.9rem, 5.5vh, 3rem); margin: 16px 0; word-break: keep-all;"></div>
+        <div class="solo-word" id="soloExtraText" style="font-size: clamp(3.8rem, 11vh, 6rem); line-height: 1.25; margin: 16px 0; word-break: keep-all;"></div>
         <div class="solo-sub" id="soloExtraHint" style="font-size: 1.15rem; color:#777;"></div>
         <div>
           <button type="button" class="action-btn blue" id="soloExtraSpeakBtn">🔊 소리 듣기</button>
@@ -906,7 +906,7 @@
     }
 
     function renderArtHTML(item, isLarge) {
-      var largeSize = 280;
+      var largeSize = 420;
       if (item.svg) return item.svg;
       if (item.img) {
         var sz = isLarge ? largeSize : 74;
