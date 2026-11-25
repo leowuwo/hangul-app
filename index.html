@@ -7,32 +7,91 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@300;400;500&display=swap');
     * { box-sizing: border-box; font-family: 'Jua', sans-serif; -webkit-tap-highlight-color: rgba(255, 122, 0, 0.2); touch-action: manipulation; }
-    html, body { margin: 0; padding: 0; background: #FFF9EC; color: #333; min-height: 100dvh; display: flex; flex-direction: column; }
 
-    /* 상단 헤더 및 탭 네비게이션 */
-    header { background: linear-gradient(135deg, #FF8C42, #FF5E5B); color: #fff; padding: 8px 14px; font-size: 1.15rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; flex-shrink: 0; }
+    /* 전체 화면 고정 후 하부 콘텐츠 영역만 스크롤 */
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #FFF9EC;
+      color: #333;
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 상단 헤더 및 탭 네비게이션 고정 */
+    header {
+      background: linear-gradient(135deg, #FF8C42, #FF5E5B);
+      color: #fff;
+      padding: 8px 14px;
+      font-size: 1.15rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      flex-shrink: 0;
+      z-index: 20;
+    }
     .header-right { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .voice-wrap { display: flex; align-items: center; gap: 4px; }
     .voice-select { background: rgba(255,255,255,0.95); color: #333; border: 2px solid #FFE082; padding: 4px 8px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; outline: none; }
     .voice-status { font-size: 0.75rem; background: rgba(0,0,0,0.18); padding: 3px 8px; border-radius: 10px; color: #FFFDF7; max-width: 170px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .star-badge { background: #FFD166; color: #5A3A00; padding: 4px 10px; border-radius: 16px; font-size: 0.9rem; }
+    .star-badge { background: #FFD166; color: #5A3A00; padding: 4px 10px; border-radius: 16px; font-size: 0.9rem; white-space: nowrap; }
 
-    nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 6px 10px; background: #FFF1D0; flex-shrink: 0; }
+    nav {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      padding: 6px 10px;
+      background: #FFF1D0;
+      border-bottom: 1.5px solid #FFE082;
+      flex-shrink: 0;
+      z-index: 19;
+    }
     @media (min-width: 720px) { nav { grid-template-columns: repeat(7, 1fr); } }
     .nav-btn { background: #fff; border: 2px solid #FFD166; border-radius: 12px; padding: 6px 4px; font-size: 0.85rem; cursor: pointer; color: #444; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .nav-btn:active { transform: scale(0.97); }
     .nav-btn.active { background: #FF7A00; color: #fff; border-color: #D96500; }
 
-    /* 메인 영역 */
-    main { flex: 1; padding: 10px 14px 18px; max-width: 1040px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; }
-    .section { display: none; flex: 1; flex-direction: column; }
+    /* 메인 영역: 내부 스크롤 컨테이너 제어 */
+    main {
+      flex: 1;
+      min-height: 0;
+      padding: 10px 14px 12px;
+      max-width: 1040px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .section {
+      display: none;
+      flex: 1;
+      min-height: 0;
+      flex-direction: column;
+      overflow: hidden;
+    }
     .section.active { display: flex; }
-    h2 { text-align: center; color: #E06000; font-size: 1.25rem; margin: 0 0 8px 0; flex-shrink: 0; }
+
+    .section-fixed-top { flex-shrink: 0; }
+    .scroll-content {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-right: 2px;
+      padding-bottom: 14px;
+    }
+
+    h2 { text-align: center; color: #E06000; font-size: 1.2rem; margin: 0 0 8px 0; flex-shrink: 0; }
     h3 { font-size: 1rem; margin: 8px 0 6px; color: #555; }
     h4 { font-size: 0.95rem; margin: 0 0 6px; color: #444; text-align: center; }
 
-    .back-bar { display: flex; justify-content: flex-start; margin-bottom: 8px; flex-shrink: 0; }
-    .back-btn { background: #6C757D; color: #fff; border: none; padding: 6px 14px; border-radius: 12px; font-size: 0.95rem; cursor: pointer; box-shadow: 0 2px 0 #495057; }
+    .back-bar { display: flex; justify-content: flex-start; margin-bottom: 6px; flex-shrink: 0; }
+    .back-btn { background: #6C757D; color: #fff; border: none; padding: 6px 14px; border-radius: 12px; font-size: 0.92rem; cursor: pointer; box-shadow: 0 2px 0 #495057; }
 
     /* 1. 자음/모음 */
     .grid-letters { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; margin-bottom: 12px; }
@@ -41,40 +100,143 @@
     .letter-card.vowel { border-color: #FF8C42; box-shadow: 0 3px 0 #E0732C; }
     .letter-name { display: block; font-size: 0.78rem; color: #666; margin-top: 2px; }
 
-    .solo-view { background: #fff; border: 3px solid #FFD166; border-radius: 22px; padding: 16px; text-align: center; box-shadow: 0 6px 15px rgba(0,0,0,0.08); flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-    .solo-big-char { font-size: clamp(4.5rem, 16vh, 7.5rem); line-height: 1.1; color: #FF7A00; margin: 6px 0; }
-    .solo-sub { font-size: 1.35rem; color: #555; margin-bottom: 12px; }
-    .solo-art { height: clamp(240px, 46vh, 420px); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
-    .solo-art .word-emoji { font-size: clamp(9rem, 33vh, 16.5rem); line-height: 1; }
-    .solo-art svg, .solo-art img { max-height: 100%; max-width: 82vw; width: auto !important; height: 100% !important; object-fit: contain; }
-    .solo-word { font-size: clamp(4rem, 12vh, 6.4rem); line-height: 1.15; color: #E06000; margin-bottom: 12px; word-break: keep-all; }
+    /* 크게 보기 (한자 앱 스타일: 암기 체크 + 이전/다음 버튼 포함) */
+    .solo-view {
+      background: #fff;
+      border: 3px solid #FFD166;
+      border-radius: 22px;
+      padding: 12px 16px;
+      text-align: center;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      overflow-y: auto;
+    }
+    .solo-main-body {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+    .solo-big-char { font-size: clamp(4.2rem, 15dvh, 7.2rem); line-height: 1.08; color: #FF7A00; margin: 4px 0; }
+    .solo-sub { font-size: clamp(1rem, 2.5dvh, 1.3rem); color: #555; margin-bottom: 4px; }
+    .solo-art { height: clamp(150px, 32dvh, 300px); display: flex; align-items: center; justify-content: center; }
+    .solo-art .word-emoji { font-size: clamp(6.5rem, 24dvh, 13rem); line-height: 1; }
+    .solo-art svg, .solo-art img { max-height: 100%; max-width: 78vw; width: auto !important; height: 100% !important; object-fit: contain; }
+    .solo-word { font-size: clamp(2.4rem, 8dvh, 4.8rem); line-height: 1.18; color: #E06000; word-break: keep-all; max-width: 96%; }
+
+    .solo-action-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      max-width: 540px;
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+    .solo-inline-toast {
+      display: none;
+      width: 100%;
+      max-width: 440px;
+      background: rgba(33, 37, 41, 0.94);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      text-align: center;
+    }
+    .solo-action-row, .solo-nav-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+    }
+    .action-btn.memorized {
+      background: #FFF4E6;
+      color: #D96500;
+      border: 2px solid #FF922B;
+      box-shadow: 0 3px 0 #E8770E;
+    }
 
     /* 2. 글자 조합 */
     .combiner-box { background: #fff; border-radius: 22px; padding: 14px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 2px solid #FFE082; display: flex; flex-direction: column; gap: 10px; }
-    .combiner-top { background: #FFFDF7; border: 2px solid #FFE8B3; border-radius: 18px; padding: 14px 18px; display: flex; align-items: center; justify-content: center; gap: 22px; flex-wrap: wrap; }
-    .combined-result { font-size: 7.8rem; color: #FF7A00; background: #FFF5E4; width: 210px; height: 210px; line-height: 210px; border-radius: 32px; border: 4px dashed #FF7A00; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .combiner-meta { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .combiner-top { background: #FFFDF7; border: 2px solid #FFE8B3; border-radius: 18px; padding: 12px 16px; display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
+    .combined-result { font-size: clamp(5rem, 15dvh, 7.5rem); color: #FF7A00; background: #FFF5E4; width: clamp(140px, 24dvh, 200px); height: clamp(140px, 24dvh, 200px); border-radius: 30px; border: 4px dashed #FF7A00; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .combiner-meta { display: flex; flex-direction: column; align-items: center; gap: 8px; }
     .example-badge { background: #E8F8F5; color: #1B6B63; border: 1.5px solid #80CBC4; padding: 6px 14px; border-radius: 14px; font-size: 1rem; }
     .step-group { background: #FFFDF8; border: 1.5px solid #F3E2B8; border-radius: 16px; padding: 8px 10px; }
     .selector-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin: 2px 0; }
-    .mini-btn { padding: 6px 10px; font-size: 1.05rem; border-radius: 10px; border: 2px solid #DDD; background: #FAFAFA; cursor: pointer; transition: opacity 0.15s, background 0.15s; }
+    .mini-btn { padding: 6px 10px; font-size: 1.02rem; border-radius: 10px; border: 2px solid #DDD; background: #FAFAFA; cursor: pointer; transition: opacity 0.15s, background 0.15s; }
     .mini-btn.selected { background: #4ECDC4; color: #fff; border-color: #2A9D8F; }
     .mini-btn.batchim-btn.selected { background: #FF8C42; color: #fff; border-color: #E06000; }
     .mini-btn:disabled { opacity: 0.28; cursor: not-allowed; background: #EAEAEA; border-color: #E0E0E0; color: #999; }
 
     /* 3. 그림 단어 & 4. 받침·문장 */
-    .top-category-bar { background: #FFF2D6; border: 2px solid #FFD166; border-radius: 16px; padding: 8px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; flex-shrink: 0; }
-    .cat-tabs { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
-    .cat-btn { padding: 6px 12px; border-radius: 16px; border: none; background: #E6E6E6; font-size: 0.92rem; cursor: pointer; color: #444; }
+    .top-category-bar { background: #FFF2D6; border: 2px solid #FFD166; border-radius: 16px; padding: 7px 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; flex-shrink: 0; }
+    .cat-tabs { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; }
+    .cat-btn { padding: 5px 11px; border-radius: 14px; border: none; background: #E6E6E6; font-size: 0.88rem; cursor: pointer; color: #444; }
     .cat-btn.active { background: #FF5E5B; color: #fff; box-shadow: 0 2px 0 #C9423F; }
-    .top-write-btn { background: #2EC4B6; color: #fff; border: none; padding: 6px 14px; border-radius: 14px; font-size: 0.92rem; cursor: pointer; box-shadow: 0 2px 0 #1F8E83; }
-    .count-info { text-align: center; color: #666; font-size: 0.85rem; margin-bottom: 6px; flex-shrink: 0; }
-    .word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 10px; padding-bottom: 8px; }
-    .word-card { background: #fff; border-radius: 16px; padding: 10px 8px; text-align: center; box-shadow: 0 3px 8px rgba(0,0,0,0.07); border: 2px solid #FFE082; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-    .word-art { height: 74px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
-    .word-emoji { font-size: 3.6rem; line-height: 1; }
-    .word-text { font-size: 1.15rem; color: #333; word-break: keep-all; }
-    .sentence-card { background: #fff; border-radius: 16px; padding: 12px 10px; text-align: center; box-shadow: 0 3px 8px rgba(0,0,0,0.07); border: 2px solid #A8DADC; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 6px; min-height: 104px; }
+    .top-write-btn { background: #2EC4B6; color: #fff; border: none; padding: 5px 12px; border-radius: 13px; font-size: 0.88rem; cursor: pointer; box-shadow: 0 2px 0 #1F8E83; }
+    .count-info { text-align: center; color: #666; font-size: 0.83rem; margin-bottom: 6px; flex-shrink: 0; }
+
+    .word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; padding-bottom: 8px; }
+    .word-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 10px 8px;
+      text-align: center;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.07);
+      border: 2px solid #FFE082;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .word-card.is-memorized, .sentence-card.is-memorized { border-color: #FF922B; background: #FFFDF8; }
+    .memo-badge {
+      position: absolute;
+      top: 5px;
+      right: 6px;
+      font-size: 0.68rem;
+      background: #FFE8CC;
+      color: #C95B00;
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    .word-art { height: 70px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+    .word-emoji { font-size: 3.4rem; line-height: 1; }
+    .word-text { font-size: 1.1rem; color: #333; word-break: keep-all; }
+
+    .sentence-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 12px 10px;
+      text-align: center;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.07);
+      border: 2px solid #A8DADC;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      min-height: 104px;
+      position: relative;
+    }
     .sentence-badge { font-size: 0.75rem; background: #E0F7FA; color: #00695C; padding: 2px 8px; border-radius: 8px; }
     .sentence-actions { display: flex; gap: 6px; margin-top: 2px; }
     .tiny-btn { border: none; border-radius: 9px; padding: 4px 8px; font-size: 0.8rem; cursor: pointer; color: #fff; }
@@ -84,30 +246,93 @@
     .pagination-bar { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 
     /* 5. 따라 쓰기 */
-    .canvas-container { background: #fff; border-radius: 20px; padding: 12px 14px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); flex: 1; display: flex; flex-direction: column; justify-content: space-between; min-height: 0; }
-    .write-header-bar { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; flex-shrink: 0; }
-    .canvas-wrap { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 320px; width: 100%; }
-    #writeCanvas { width: 100%; height: 100%; min-height: 320px; max-width: 900px; max-height: 56vh; border: 4px solid #6CD4C3; border-radius: 20px; background: #fff; touch-action: none; cursor: crosshair; display: block; }
-    .write-controls { margin-top: 8px; flex-shrink: 0; }
+    .canvas-container { background: #fff; border-radius: 20px; padding: 10px 14px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); flex: 1; display: flex; flex-direction: column; justify-content: space-between; min-height: 0; }
+    .write-header-bar { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; flex-shrink: 0; }
+    .canvas-wrap { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 180px; width: 100%; overflow: hidden; }
+    #writeCanvas { width: 100%; height: 100%; max-width: 900px; max-height: 56dvh; border: 4px solid #6CD4C3; border-radius: 20px; background: #fff; touch-action: none; cursor: crosshair; display: block; }
+    .write-controls { margin-top: 6px; flex-shrink: 0; }
 
-    .action-btn { background: #FF7A00; color: #fff; border: none; padding: 9px 16px; font-size: 1rem; border-radius: 14px; margin: 3px; cursor: pointer; box-shadow: 0 3px 0 #C85500; transition: opacity 0.2s, background 0.2s; }
+    .action-btn { background: #FF7A00; color: #fff; border: none; padding: 8px 15px; font-size: 0.96rem; border-radius: 13px; margin: 2px; cursor: pointer; box-shadow: 0 3px 0 #C85500; transition: opacity 0.2s, background 0.2s; }
     .action-btn.blue { background: #3A86FF; box-shadow: 0 3px 0 #2667CC; }
     .action-btn.green { background: #2EC4B6; box-shadow: 0 3px 0 #1F8E83; }
     .action-btn:disabled { background: #CCCCCC !important; box-shadow: 0 3px 0 #999999 !important; color: #777777 !important; cursor: not-allowed; opacity: 0.7; }
 
-    /* 6. 한글 퀴즈 */
-    .quiz-box { background: #fff; border-radius: 20px; padding: 14px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); flex: 1; display: flex; flex-direction: column; justify-content: space-between; min-height: 0; }
-    .quiz-art { height: clamp(120px, 26vh, 200px); display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; }
-    .quiz-art .word-emoji { font-size: clamp(5rem, 18vh, 8rem); }
-    .quiz-art svg, .quiz-art img { max-height: 100%; max-width: 60vw; width: auto !important; height: 100% !important; object-fit: contain; }
-    .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
-    .quiz-opt-btn { background: #FFF9EC; border: 3px solid #FFD166; border-radius: 14px; padding: 12px 8px; font-size: 1.35rem; cursor: pointer; }
+    /* 6. 한글 퀴즈 (그림 없이 소리만 듣고 단어 맞히기) */
+    .quiz-box {
+      background: #fff;
+      border-radius: 20px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-y: auto;
+    }
+    .quiz-sound-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      background: #FFF9EC;
+      border: 2.5px dashed #FFD166;
+      border-radius: 18px;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 520px;
+    }
+    .quiz-sound-guide { font-size: 1rem; color: #666; }
+    .quiz-listen-btn { font-size: 1.2rem; padding: 12px 26px; border-radius: 16px; }
+    .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .quiz-opt-btn { background: #FFF9EC; border: 3px solid #FFD166; border-radius: 14px; padding: 14px 8px; font-size: 1.35rem; cursor: pointer; word-break: keep-all; }
+    .quiz-opt-btn:active { transform: scale(0.98); }
 
     /* 7. 나의 공부방 */
-    .stats-card { background: #fff; border-radius: 20px; padding: 16px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; }
-    .sticker-board { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; font-size: 2.2rem; background: #FFF5E4; padding: 14px; border-radius: 16px; min-height: 120px; align-content: flex-start; }
+    .stats-card { background: #fff; border-radius: 20px; padding: 16px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; overflow-y: auto; }
+    .sticker-board { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; font-size: 2rem; background: #FFF5E4; padding: 12px; border-radius: 16px; min-height: 110px; align-content: flex-start; flex: 1; overflow-y: auto; }
 
-    .toast-msg { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: rgba(33, 37, 41, 0.9); color: #fff; padding: 8px 16px; border-radius: 14px; font-size: 0.95rem; z-index: 999; display: none; }
+    .toast-msg { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: rgba(33, 37, 41, 0.92); color: #fff; padding: 8px 16px; border-radius: 14px; font-size: 0.95rem; z-index: 999; display: none; }
+
+    /* 가로 화면(Landscape) 및 낮은 높이 화면 최적화 */
+    @media (orientation: landscape) and (max-height: 600px) {
+      header { padding: 4px 10px; font-size: 1rem; }
+      nav { grid-template-columns: repeat(7, 1fr); padding: 4px 8px; gap: 4px; }
+      .nav-btn { padding: 4px 2px; font-size: 0.78rem; }
+      main { padding: 6px 10px 8px; max-width: 100%; }
+      h2 { font-size: 1.02rem; margin-bottom: 4px; }
+      .top-category-bar { padding: 5px 8px; margin-bottom: 4px; }
+      .count-info { margin-bottom: 4px; font-size: 0.78rem; }
+
+      .solo-view {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+        align-items: center;
+        padding: 8px 12px;
+      }
+      .solo-view > .back-bar { width: 100%; margin-bottom: 2px; }
+      .solo-main-body { width: auto; flex: 1; min-width: 240px; }
+      .solo-art { height: clamp(110px, 38dvh, 210px); }
+      .solo-art .word-emoji { font-size: clamp(5rem, 28dvh, 9rem); }
+      .solo-word { font-size: clamp(2rem, 9dvh, 3.6rem); }
+      .solo-action-stack { width: auto; max-width: 380px; margin-top: 0; }
+
+      .quiz-box {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 14px;
+      }
+      .quiz-sound-panel { width: 42%; max-width: none; margin: 0; padding: 10px; }
+      .quiz-right-area { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+      .quiz-options { margin-top: 0; gap: 8px; }
+      .quiz-opt-btn { padding: 10px 6px; font-size: 1.15rem; }
+    }
   </style>
 </head>
 <body>
@@ -137,132 +362,176 @@
   <main>
     <!-- 1. 자음·모음 -->
     <section id="tab1" class="section active">
-      <div id="letterListView">
-        <h2>🔤 글자를 눌러 크게 보고 소리를 들어보세요!</h2>
-        <h3>기본자음 (14개)</h3>
-        <div class="grid-letters" id="consonantGrid"></div>
-        <h3>쌍자음 (5개)</h3>
-        <div class="grid-letters" id="doubleConsonantGrid"></div>
-        <h3>모음 (21개)</h3>
-        <div class="grid-letters" id="vowelGrid"></div>
+      <div id="letterListView" style="display:flex; flex-direction:column; flex:1; min-height:0;">
+        <div class="section-fixed-top">
+          <h2>🔤 글자를 눌러 크게 보고 소리를 들어보세요!</h2>
+        </div>
+        <div class="scroll-content">
+          <h3>기본자음 (14개)</h3>
+          <div class="grid-letters" id="consonantGrid"></div>
+          <h3>쌍자음 (5개)</h3>
+          <div class="grid-letters" id="doubleConsonantGrid"></div>
+          <h3>모음 (21개)</h3>
+          <div class="grid-letters" id="vowelGrid"></div>
+        </div>
       </div>
       <div id="letterSoloView" class="solo-view" style="display:none;">
         <div class="back-bar" style="width:100%;"><button type="button" class="back-btn" onclick="closeLetterSolo()">← 뒤로 가기</button></div>
-        <div class="solo-big-char" id="soloLetterChar">ㄱ</div>
-        <div class="solo-sub" id="soloLetterDesc">기역 · 그</div>
-        <div>
-          <button type="button" class="action-btn blue" id="soloLetterSpeakBtn">🔊 소리 듣기</button>
-          <button type="button" class="action-btn green" id="soloLetterWriteBtn">✍️ 따라 쓰기</button>
+        <div class="solo-main-body">
+          <div class="solo-big-char" id="soloLetterChar">ㄱ</div>
+          <div class="solo-sub" id="soloLetterDesc">기역 · 그</div>
+        </div>
+        <div class="solo-action-stack">
+          <div class="solo-action-row">
+            <button type="button" class="action-btn blue" id="soloLetterSpeakBtn">🔊 소리 듣기</button>
+            <button type="button" class="action-btn green" id="soloLetterWriteBtn">✍️ 따라 쓰기</button>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- 2. 글자 조합 -->
     <section id="tab2" class="section">
-      <h2>🧩 자음, 모음, 받침을 합쳐서 읽어보자!</h2>
-      <div class="combiner-box">
-        <div class="combiner-top">
-          <div class="combined-result" id="combinedChar" onclick="speakCurrentCombined()">가</div>
-          <div class="combiner-meta">
-            <div class="example-badge" id="combinedExamples">💡 들어가는 단어: 가방, 가족</div>
-            <div>
-              <button type="button" class="action-btn blue" onclick="speakCurrentCombined()">🔊 소리 듣기</button>
-              <button type="button" class="action-btn green" onclick="sendToWrite(document.getElementById('combinedChar').textContent)">✍️ 이 글자 따라 쓰기</button>
+      <div class="section-fixed-top">
+        <h2>🧩 자음, 모음, 받침을 합쳐서 읽어보자!</h2>
+      </div>
+      <div class="scroll-content">
+        <div class="combiner-box">
+          <div class="combiner-top">
+            <div class="combined-result" id="combinedChar" onclick="speakCurrentCombined()">가</div>
+            <div class="combiner-meta">
+              <div class="example-badge" id="combinedExamples">💡 들어가는 단어: 가방, 가족</div>
+              <div>
+                <button type="button" class="action-btn blue" onclick="speakCurrentCombined()">🔊 소리 듣기</button>
+                <button type="button" class="action-btn green" onclick="sendToWrite(document.getElementById('combinedChar').textContent)">✍️ 이 글자 따라 쓰기</button>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="step-group">
-          <h4>1단계: 첫소리 자음 선택</h4>
-          <div class="selector-row" id="combConsonants"></div>
-        </div>
-        <div class="step-group">
-          <h4>2단계: 모음 선택</h4>
-          <div class="selector-row" id="combVowels"></div>
-        </div>
-        <div class="step-group">
-          <h4>3단계: 받침 자음 선택 (홑받침 · 겹받침)</h4>
-          <div class="selector-row" id="combBatchim"></div>
+          <div class="step-group">
+            <h4>1단계: 첫소리 자음 선택</h4>
+            <div class="selector-row" id="combConsonants"></div>
+          </div>
+          <div class="step-group">
+            <h4>2단계: 모음 선택</h4>
+            <div class="selector-row" id="combVowels"></div>
+          </div>
+          <div class="step-group">
+            <h4>3단계: 받침 자음 선택 (홑받침 · 겹받침)</h4>
+            <div class="selector-row" id="combBatchim"></div>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- 3. 그림 단어 -->
     <section id="tab3" class="section">
-      <div id="wordListView" style="display:flex; flex-direction:column;">
-        <h2>🖼️ 그림과 단어를 눌러 크게 보세요!</h2>
-        <div class="top-category-bar">
-          <div class="cat-tabs">
-            <button type="button" class="cat-btn active" onclick="filterWords('life', this)">🍎 생활단어</button>
-            <button type="button" class="cat-btn" onclick="filterWords('carbot', this)">🤖 헬로카봇</button>
-            <button type="button" class="cat-btn" onclick="filterWords('metalcardbot', this)">🦾 메탈카드봇</button>
-            <button type="button" class="cat-btn" onclick="filterWords('pokemon', this)">⚡ 포켓몬스터</button>
+      <div id="wordListView" style="display:flex; flex-direction:column; flex:1; min-height:0;">
+        <div class="section-fixed-top">
+          <h2>🖼️ 그림과 단어를 눌러 크게 보세요!</h2>
+          <div class="top-category-bar">
+            <div class="cat-tabs">
+              <button type="button" class="cat-btn active" onclick="filterWords('life', this)">🍎 생활단어</button>
+              <button type="button" class="cat-btn" onclick="filterWords('carbot', this)">🤖 헬로카봇</button>
+              <button type="button" class="cat-btn" onclick="filterWords('metalcardbot', this)">🦾 메탈카드봇</button>
+              <button type="button" class="cat-btn" onclick="filterWords('pokemon', this)">⚡ 포켓몬스터</button>
+            </div>
+            <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+              <input type="text" id="wordSearch" placeholder="단어 검색" oninput="renderWords()" style="padding:5px 9px; width:125px; border-radius:12px; border:2px solid #CCC; font-size:0.88rem;">
+              <button type="button" class="top-write-btn" onclick="sendToWrite(selectedWordForWrite)">
+                ✍️ <span id="topWriteLabel">단어</span> 쓰기
+              </button>
+            </div>
           </div>
-          <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-            <input type="text" id="wordSearch" placeholder="단어 검색" oninput="renderWords()" style="padding:6px 10px; width:130px; border-radius:12px; border:2px solid #CCC; font-size:0.9rem;">
-            <button type="button" class="top-write-btn" onclick="sendToWrite(selectedWordForWrite)">
-              ✍️ <span id="topWriteLabel">단어</span> 쓰기
-            </button>
-          </div>
+          <div class="count-info" id="wordCountInfo"></div>
         </div>
-        <div class="count-info" id="wordCountInfo"></div>
-        <div class="word-grid" id="wordGrid"></div>
+        <div class="scroll-content">
+          <div class="word-grid" id="wordGrid"></div>
+        </div>
       </div>
 
       <div id="wordSoloView" class="solo-view" style="display:none;">
-        <div class="back-bar" style="width:100%;"><button type="button" class="back-btn" onclick="closeWordSolo()">← 뒤로 가기</button></div>
-        <div class="solo-art" id="soloWordArt"></div>
-        <div class="solo-word" id="soloWordText"></div>
-        <div>
-          <button type="button" class="action-btn blue" id="soloWordSpeakBtn">🔊 소리 듣기</button>
-          <button type="button" class="action-btn green" id="soloWordWriteBtn">✍️ 따라 쓰기</button>
+        <div class="back-bar" style="width:100%;"><button type="button" class="back-btn" onclick="closeWordSolo()">← 목록으로</button></div>
+        <div class="solo-main-body">
+          <div class="solo-art" id="soloWordArt"></div>
+          <div class="solo-word" id="soloWordText"></div>
+        </div>
+        <div class="solo-action-stack">
+          <div id="wordSoloToast" class="solo-inline-toast" role="status" aria-live="polite"></div>
+          <div class="solo-action-row">
+            <button type="button" class="action-btn blue" id="soloWordSpeakBtn">🔊 소리 듣기</button>
+            <button type="button" class="action-btn green" id="soloWordWriteBtn">✍️ 따라 쓰기</button>
+          </div>
+          <div class="solo-action-row">
+            <button type="button" class="action-btn" id="soloWordMemoBtn" onclick="toggleMemorizedCurrentWord()">암기 체크</button>
+          </div>
+          <div class="solo-nav-row">
+            <button type="button" class="back-btn" id="wordSoloPrevBtn" style="background:#3A86FF; box-shadow:0 2px 0 #2667CC;" onclick="prevWordSolo()">← 이전</button>
+            <button type="button" class="back-btn" id="wordSoloNextBtn" style="background:#FF7A00; box-shadow:0 2px 0 #C85500;" onclick="nextWordSolo()">다음 →</button>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- 4. 받침·문장 -->
     <section id="tab_extra" class="section">
-      <div id="extraListView" style="display:flex; flex-direction:column;">
-        <h2>📚 짧은 문장 읽기 · 받침 단어 · 낱말 카드</h2>
-        <div class="top-category-bar">
-          <div class="cat-tabs" id="extraTypeTabs">
-            <button type="button" class="cat-btn active" id="btnSentenceTab" onclick="filterExtra('sentence', this)">💬 짧은 문장 (320개)</button>
-            <button type="button" class="cat-btn" onclick="filterExtra('batchim', this)">🔤 받침 단어</button>
-            <button type="button" class="cat-btn" onclick="filterExtra('card', this)">🗂️ 낱말 카드</button>
+      <div id="extraListView" style="display:flex; flex-direction:column; flex:1; min-height:0;">
+        <div class="section-fixed-top">
+          <h2>📚 짧은 문장 읽기 · 받침 단어 · 낱말 카드</h2>
+          <div class="top-category-bar">
+            <div class="cat-tabs" id="extraTypeTabs">
+              <button type="button" class="cat-btn active" id="btnSentenceTab" onclick="filterExtra('sentence', this)">💬 짧은 문장 (320개)</button>
+              <button type="button" class="cat-btn" onclick="filterExtra('batchim', this)">🔤 받침 단어</button>
+              <button type="button" class="cat-btn" onclick="filterExtra('card', this)">🗂️ 낱말 카드</button>
+            </div>
+            <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+              <select id="extraTopicSelect" onchange="extraPage = 1; renderExtraItems();" style="padding:5px 8px; border-radius:12px; border:2px solid #FFD166; font-size:0.86rem; background:#fff;">
+                <option value="all">전체 주제</option>
+                <option value="가족/인사">가족/인사</option>
+                <option value="동물/자연">동물/자연</option>
+                <option value="음식/과일">음식/과일</option>
+                <option value="학교/친구">학교/친구</option>
+                <option value="생활/감정">생활/감정</option>
+                <option value="계절/날씨">계절/날씨</option>
+                <option value="탈것/사물">탈것/사물</option>
+                <option value="동화/상상">동화/상상</option>
+              </select>
+              <select id="extraBatchimFilter" onchange="extraPage = 1; renderExtraItems();" style="padding:5px 8px; border-radius:12px; border:2px solid #A8DADC; font-size:0.86rem; background:#fff;">
+                <option value="all">받침 전체</option>
+                <option value="with">받침 있는 것만</option>
+                <option value="without">받침 없는 것만</option>
+              </select>
+              <input type="text" id="extraSearch" placeholder="검색어 입력" oninput="extraPage = 1; renderExtraItems();" style="padding:5px 9px; width:120px; border-radius:12px; border:2px solid #CCC; font-size:0.88rem;">
+              <button type="button" class="top-write-btn" onclick="pickRandomExtraItem()">🎲 랜덤 뽑기</button>
+            </div>
           </div>
-          <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-            <select id="extraTopicSelect" onchange="extraPage = 1; renderExtraItems();" style="padding:6px 8px; border-radius:12px; border:2px solid #FFD166; font-size:0.88rem; background:#fff;">
-              <option value="all">전체 주제</option>
-              <option value="가족/인사">가족/인사</option>
-              <option value="동물/자연">동물/자연</option>
-              <option value="음식/과일">음식/과일</option>
-              <option value="학교/친구">학교/친구</option>
-              <option value="생활/감정">생활/감정</option>
-              <option value="계절/날씨">계절/날씨</option>
-              <option value="탈것/사물">탈것/사물</option>
-              <option value="동화/상상">동화/상상</option>
-            </select>
-            <select id="extraBatchimFilter" onchange="extraPage = 1; renderExtraItems();" style="padding:6px 8px; border-radius:12px; border:2px solid #A8DADC; font-size:0.88rem; background:#fff;">
-              <option value="all">받침 전체</option>
-              <option value="with">받침 있는 것만</option>
-              <option value="without">받침 없는 것만</option>
-            </select>
-            <input type="text" id="extraSearch" placeholder="검색어 입력" oninput="extraPage = 1; renderExtraItems();" style="padding:6px 10px; width:125px; border-radius:12px; border:2px solid #CCC; font-size:0.9rem;">
-            <button type="button" class="top-write-btn" onclick="pickRandomExtraItem()">🎲 랜덤 뽑기</button>
-          </div>
+          <div class="count-info" id="extraCountInfo"></div>
         </div>
-        <div class="count-info" id="extraCountInfo"></div>
-        <div class="word-grid" id="extraGrid"></div>
-        <div class="pagination-bar" id="extraPagination"></div>
+        <div class="scroll-content">
+          <div class="word-grid" id="extraGrid"></div>
+          <div class="pagination-bar" id="extraPagination"></div>
+        </div>
       </div>
 
       <div id="extraSoloView" class="solo-view" style="display:none;">
         <div class="back-bar" style="width:100%;"><button type="button" class="back-btn" onclick="closeExtraSolo()">← 목록으로</button></div>
-        <div class="solo-sub" id="soloExtraBadge" style="background:#FFF2D6; padding:4px 14px; border-radius:14px; font-size:1rem;">짧은 문장</div>
-        <div class="solo-word" id="soloExtraText" style="font-size: clamp(3.8rem, 11vh, 6rem); line-height: 1.25; margin: 16px 0; word-break: keep-all;"></div>
-        <div class="solo-sub" id="soloExtraHint" style="font-size: 1.15rem; color:#777;"></div>
-        <div>
-          <button type="button" class="action-btn blue" id="soloExtraSpeakBtn">🔊 소리 듣기</button>
-          <button type="button" class="action-btn green" id="soloExtraWriteBtn">✍️ 따라 쓰기</button>
+        <div class="solo-main-body">
+          <div class="solo-sub" id="soloExtraBadge" style="background:#FFF2D6; padding:4px 14px; border-radius:14px; font-size:0.95rem;">짧은 문장</div>
+          <div class="solo-word" id="soloExtraText" style="font-size: clamp(2.2rem, 8dvh, 4.6rem); line-height: 1.25; margin: 8px 0; word-break: keep-all;"></div>
+          <div class="solo-sub" id="soloExtraHint" style="font-size: 1rem; color:#777;"></div>
+        </div>
+        <div class="solo-action-stack">
+          <div id="extraSoloToast" class="solo-inline-toast" role="status" aria-live="polite"></div>
+          <div class="solo-action-row">
+            <button type="button" class="action-btn blue" id="soloExtraSpeakBtn">🔊 소리 듣기</button>
+            <button type="button" class="action-btn green" id="soloExtraWriteBtn">✍️ 따라 쓰기</button>
+          </div>
+          <div class="solo-action-row">
+            <button type="button" class="action-btn" id="soloExtraMemoBtn" onclick="toggleMemorizedCurrentExtra()">암기 체크</button>
+          </div>
+          <div class="solo-nav-row">
+            <button type="button" class="back-btn" id="extraSoloPrevBtn" style="background:#3A86FF; box-shadow:0 2px 0 #2667CC;" onclick="prevExtraSolo()">← 이전</button>
+            <button type="button" class="back-btn" id="extraSoloNextBtn" style="background:#FF7A00; box-shadow:0 2px 0 #C85500;" onclick="nextExtraSolo()">다음 →</button>
+          </div>
         </div>
       </div>
     </section>
@@ -272,8 +541,8 @@
       <div class="canvas-container">
         <div class="write-header-bar">
           <button type="button" class="back-btn" onclick="goBackFromWrite()">← 뒤로</button>
-          <span style="font-size:1.15rem;">연습 글자: </span>
-          <strong id="targetWriteWord" style="font-size:1.85rem; color:#FF7A00; word-break:keep-all;">할아버지와 함께 화분에 물을 주어요.</strong>
+          <span style="font-size:1.05rem;">연습 글자: </span>
+          <strong id="targetWriteWord" style="font-size:1.55rem; color:#FF7A00; word-break:keep-all;">할아버지와 함께 화분에 물을 주어요.</strong>
           <button type="button" class="mini-btn" onclick="speak(document.getElementById('targetWriteWord').textContent)">🔊 듣기</button>
           <button type="button" class="mini-btn" onclick="pickRandomWriteWord(true)">🎲 다른 단어</button>
         </div>
@@ -287,28 +556,36 @@
       </div>
     </section>
 
-    <!-- 6. 한글 퀴즈 -->
+    <!-- 6. 한글 퀴즈 (그림 없이 소리만 듣고 단어 선택) -->
     <section id="tab5" class="section">
-      <h2>🎯 그림과 소리를 듣고 정답을 맞혀요!</h2>
+      <div class="section-fixed-top">
+        <h2>🎯 단어 소리를 듣고 알맞은 글자를 골라요!</h2>
+      </div>
       <div class="quiz-box">
-        <div>
-          <div class="quiz-art" id="quizArt"></div>
-          <button type="button" class="action-btn blue" onclick="playQuizHint()">🔊 힌트 소리 듣기</button>
+        <div class="quiz-sound-panel">
+          <div style="font-size:2.6rem; line-height:1;">🎧</div>
+          <div class="quiz-sound-guide">버튼을 눌러 들리는 단어를 맞혀 보세요!</div>
+          <button type="button" class="action-btn blue quiz-listen-btn" onclick="playQuizHint()">🔊 단어 소리 듣기</button>
         </div>
-        <div class="quiz-options" id="quizOptions"></div>
-        <p id="quizFeedback" style="font-size:1.15rem; margin:6px 0 0; min-height:24px;"></p>
+        <div class="quiz-right-area">
+          <div class="quiz-options" id="quizOptions"></div>
+          <p id="quizFeedback" style="font-size:1.1rem; margin:10px 0 0; min-height:24px;"></p>
+        </div>
       </div>
     </section>
 
     <!-- 7. 나의 공부방 -->
     <section id="tab6" class="section">
-      <h2>🏆 나의 한글 공부방</h2>
+      <div class="section-fixed-top">
+        <h2>🏆 나의 한글 공부방</h2>
+      </div>
       <div class="stats-card">
         <div>
           <h3 style="margin:0 0 6px;">우리 아이 칭찬 스티커 판</h3>
-          <div style="font-size:1.1rem;">
+          <div style="font-size:1.05rem;">
             ✍️ 따라 쓴 단어 수: <strong id="writtenCount">0</strong>개 |
-            🎯 맞힌 퀴즈 수: <strong id="quizScore">0</strong>개
+            🎯 맞힌 퀴즈 수: <strong id="quizScore">0</strong>개 |
+            ✅ 암기 체크: <strong id="memoTotalCount">0</strong>개
           </div>
         </div>
         <div class="sticker-board" id="stickerBoard"></div>
@@ -324,6 +601,9 @@
   <script>
     var isHandlingPopState = false;
     var currentSoloSnapshot = null;
+    var selectedWordItem = null;
+    var selectedExtraItem = null;
+    var soloInlineTimer = null;
 
     function safeRun(fn, label) {
       try {
@@ -459,14 +739,35 @@
       }
     });
 
-    var memoryStore = { stars: 0, written: 0, quiz: 0, stickers: [] };
+    var memoryStore = { stars: 0, written: 0, quiz: 0, stickers: [], memorizedWords: [], memorizedExtras: [] };
     var progress = loadProgress();
     var voiceProfile = 'woman';
     var previousTabId = 'tab1';
     var cachedVoices = [];
     var toastTimer = null;
 
-    function showToast(msg) {
+    function hideSoloInlineToasts() {
+      var wToast = document.getElementById('wordSoloToast');
+      var eToast = document.getElementById('extraSoloToast');
+      if (wToast) wToast.style.display = 'none';
+      if (eToast) eToast.style.display = 'none';
+    }
+
+    function showToast(msg, soloTarget) {
+      var inlineEl = null;
+      if (soloTarget === 'word') inlineEl = document.getElementById('wordSoloToast');
+      else if (soloTarget === 'extra') inlineEl = document.getElementById('extraSoloToast');
+
+      if (inlineEl) {
+        inlineEl.textContent = msg;
+        inlineEl.style.display = 'block';
+        if (soloInlineTimer) clearTimeout(soloInlineTimer);
+        soloInlineTimer = setTimeout(function() {
+          inlineEl.style.display = 'none';
+        }, 1800);
+        return;
+      }
+
       var el = document.getElementById('toastMsg');
       if (!el) return;
       el.textContent = msg;
@@ -551,7 +852,16 @@
         var raw = window.localStorage.getItem('hangulAppCustomV1');
         if (raw) {
           var parsed = JSON.parse(raw);
-          if (parsed && typeof parsed === 'object') return parsed;
+          if (parsed && typeof parsed === 'object') {
+            return {
+              stars: parsed.stars || 0,
+              written: parsed.written || 0,
+              quiz: parsed.quiz || 0,
+              stickers: Array.isArray(parsed.stickers) ? parsed.stickers : [],
+              memorizedWords: Array.isArray(parsed.memorizedWords) ? parsed.memorizedWords : [],
+              memorizedExtras: Array.isArray(parsed.memorizedExtras) ? parsed.memorizedExtras : []
+            };
+          }
         }
       } catch (e) {}
       return memoryStore;
@@ -560,6 +870,101 @@
     function saveProgress() {
       memoryStore = progress;
       try { window.localStorage.setItem('hangulAppCustomV1', JSON.stringify(progress)); } catch (e) {}
+    }
+
+    /* 암기 체크 유틸리티 */
+    function makeWordMemoKey(item) {
+      if (!item) return '';
+      return (item.cat || 'life') + '|' + (item.word || '');
+    }
+
+    function isWordMemorized(item) {
+      if (!item) return false;
+      var key = makeWordMemoKey(item);
+      var list = Array.isArray(progress.memorizedWords) ? progress.memorizedWords : [];
+      return list.indexOf(key) !== -1;
+    }
+
+    function updateSoloWordMemoUI(item) {
+      var btn = document.getElementById('soloWordMemoBtn');
+      if (!btn || !item) return;
+      if (isWordMemorized(item)) {
+        btn.classList.add('memorized');
+        btn.textContent = '✅ 암기 완료';
+      } else {
+        btn.classList.remove('memorized');
+        btn.textContent = '암기 체크';
+      }
+    }
+
+    function toggleMemorizedCurrentWord() {
+      if (!selectedWordItem) return;
+      if (!Array.isArray(progress.memorizedWords)) progress.memorizedWords = [];
+      var key = makeWordMemoKey(selectedWordItem);
+      var idx = progress.memorizedWords.indexOf(key);
+      if (idx !== -1) {
+        progress.memorizedWords.splice(idx, 1);
+        saveProgress();
+        updateSoloWordMemoUI(selectedWordItem);
+        updateStatsUI();
+        renderWords();
+        showToast('"' + selectedWordItem.word + '" 암기 체크를 해제했어요.', 'word');
+      } else {
+        progress.memorizedWords.push(key);
+        saveProgress();
+        updateSoloWordMemoUI(selectedWordItem);
+        updateStatsUI();
+        renderWords();
+        playChime(true);
+        showToast('"' + selectedWordItem.word + '" 암기 체크 완료!', 'word');
+      }
+    }
+
+    function makeExtraMemoKey(item) {
+      if (!item) return '';
+      return (item.type || 'sentence') + '|' + (item.text || '');
+    }
+
+    function isExtraMemorized(item) {
+      if (!item) return false;
+      var key = makeExtraMemoKey(item);
+      var list = Array.isArray(progress.memorizedExtras) ? progress.memorizedExtras : [];
+      return list.indexOf(key) !== -1;
+    }
+
+    function updateSoloExtraMemoUI(item) {
+      var btn = document.getElementById('soloExtraMemoBtn');
+      if (!btn || !item) return;
+      if (isExtraMemorized(item)) {
+        btn.classList.add('memorized');
+        btn.textContent = '✅ 암기 완료';
+      } else {
+        btn.classList.remove('memorized');
+        btn.textContent = '암기 체크';
+      }
+    }
+
+    function toggleMemorizedCurrentExtra() {
+      if (!selectedExtraItem) return;
+      if (!Array.isArray(progress.memorizedExtras)) progress.memorizedExtras = [];
+      var key = makeExtraMemoKey(selectedExtraItem);
+      var idx = progress.memorizedExtras.indexOf(key);
+      if (idx !== -1) {
+        progress.memorizedExtras.splice(idx, 1);
+        saveProgress();
+        updateSoloExtraMemoUI(selectedExtraItem);
+        updateStatsUI();
+        renderExtraItems();
+        showToast('암기 체크를 해제했어요.', 'extra');
+      } else {
+        progress.memorizedExtras.push(key);
+        saveProgress();
+        updateSoloExtraMemoUI(selectedExtraItem);
+        updateStatsUI();
+        renderExtraItems();
+        playChime(true);
+        showToast('암기 체크 완료!', 'extra');
+      }
     }
 
     function playChime(ok) {
@@ -656,7 +1061,7 @@
     function closeLetterSolo(skipHistoryPush) {
       currentSoloSnapshot = null;
       document.getElementById('letterSoloView').style.display = 'none';
-      document.getElementById('letterListView').style.display = 'block';
+      document.getElementById('letterListView').style.display = 'flex';
       if (!skipHistoryPush) pushHangulHistoryState();
     }
 
@@ -780,8 +1185,7 @@
         }
       }
 
-      // 겹받침이 포함된 음절들을 명시적으로 허용
-      var extraSyllables = ['값','밝','닭','삶','흙','앉','넓','읽','맑','밟','몫','많','싫','달','말','발','별','불','물','길','손','눈','산','집','책','밥','국','빵','꽃','숲','달','밤','강','콩','곰','공','칼','풀','돌','벌'];
+      var extraSyllables = ['값','밝','닭','삶','흙','앉','넓','읽','맑','밟','몫','많','싫','달','말','발','별','불','물','길','손','눈','산','집','책','밥','국','빵','꽃','숲','밤','강','콩','곰','공','칼','풀','돌','벌'];
       for (var x = 0; x < extraSyllables.length; x++) {
         validSyllableSet[extraSyllables[x]] = true;
       }
@@ -1020,10 +1424,10 @@
     }
 
     function renderArtHTML(item, isLarge) {
-      var largeSize = 420;
+      var largeSize = 360;
       if (item.svg) return item.svg;
       if (item.img) {
-        var sz = isLarge ? largeSize : 74;
+        var sz = isLarge ? largeSize : 70;
         var fallback = (item.cat === 'carbot' || item.cat === 'metalcardbot' || item.cat === 'pokemon')
           ? 'data:image/svg+xml;utf8,' + encodeURIComponent(createCharacterSVG(item, sz))
           : '';
@@ -1033,7 +1437,7 @@
         return '<img src="' + item.img + '" alt="' + item.word + '" loading="lazy" onerror="' + onErr + '" style="width:' + sz + 'px;height:' + sz + 'px;object-fit:contain;border-radius:14px;">';
       }
       if (item.cat === 'carbot' || item.cat === 'metalcardbot' || item.cat === 'pokemon') {
-        return createCharacterSVG(item, isLarge ? largeSize : 74);
+        return createCharacterSVG(item, isLarge ? largeSize : 70);
       }
       return '<div class="word-emoji">' + (item.emoji || '✨') + '</div>';
     }
@@ -1056,6 +1460,74 @@
     var currentCategory = 'life';
     var selectedWordForWrite = '';
 
+    function getFilteredWordList() {
+      var q = (document.getElementById('wordSearch').value || '').trim().toLowerCase();
+      var filtered = [];
+      for (var i = 0; i < wordDatabase.length; i++) {
+        var it = wordDatabase[i];
+        if (it.cat !== currentCategory) continue;
+        if (q && it.word.toLowerCase().indexOf(q) === -1) continue;
+        filtered.push(it);
+      }
+      return filtered;
+    }
+
+    function findWordSoloIndex(list, item) {
+      if (!list || !item) return -1;
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].word === item.word && list[i].cat === item.cat) return i;
+      }
+      return -1;
+    }
+
+    function updateWordSoloNavButtons(item) {
+      var prevBtn = document.getElementById('wordSoloPrevBtn');
+      var nextBtn = document.getElementById('wordSoloNextBtn');
+      var list = getFilteredWordList();
+      var idx = findWordSoloIndex(list, item);
+
+      if (prevBtn) {
+        if (list.length <= 1) {
+          prevBtn.disabled = true;
+          prevBtn.style.opacity = '0.5';
+          prevBtn.textContent = '← 이전';
+        } else {
+          prevBtn.disabled = false;
+          prevBtn.style.opacity = '1';
+          var prevIdx = idx >= 0 ? (idx - 1 + list.length) % list.length : list.length - 1;
+          prevBtn.textContent = '← 이전 (' + list[prevIdx].word + ')';
+        }
+      }
+      if (nextBtn) {
+        if (list.length <= 1) {
+          nextBtn.disabled = true;
+          nextBtn.style.opacity = '0.5';
+          nextBtn.textContent = '다음 →';
+        } else {
+          nextBtn.disabled = false;
+          nextBtn.style.opacity = '1';
+          var nextIdx = idx >= 0 ? (idx + 1) % list.length : 0;
+          nextBtn.textContent = '다음 (' + list[nextIdx].word + ') →';
+        }
+      }
+    }
+
+    function prevWordSolo() {
+      var list = getFilteredWordList();
+      if (!list || list.length === 0) return;
+      var idx = findWordSoloIndex(list, selectedWordItem);
+      var prevIdx = idx >= 0 ? (idx - 1 + list.length) % list.length : list.length - 1;
+      openWordSolo(list[prevIdx]);
+    }
+
+    function nextWordSolo() {
+      var list = getFilteredWordList();
+      if (!list || list.length === 0) return;
+      var idx = findWordSoloIndex(list, selectedWordItem);
+      var nextIdx = idx >= 0 ? (idx + 1) % list.length : 0;
+      openWordSolo(list[nextIdx]);
+    }
+
     function filterWords(cat, btn) {
       currentCategory = cat;
       var btns = document.querySelectorAll('#tab3 .cat-btn');
@@ -1066,6 +1538,8 @@
     }
 
     function openWordSolo(item, skipHistoryPush) {
+      hideSoloInlineToasts();
+      selectedWordItem = item;
       currentSoloSnapshot = { kind: 'word', data: { word: item.word, cat: item.cat, emoji: item.emoji || '', img: item.img || '' } };
       selectedWordForWrite = item.word;
       document.getElementById('topWriteLabel').textContent = item.word;
@@ -1075,11 +1549,15 @@
       document.getElementById('soloWordText').textContent = item.word;
       document.getElementById('soloWordSpeakBtn').onclick = function() { speak(item.word); };
       document.getElementById('soloWordWriteBtn').onclick = function() { previousTabId = 'tab3'; sendToWrite(item.word); };
+      updateSoloWordMemoUI(item);
+      updateWordSoloNavButtons(item);
       speak(item.word);
       if (!skipHistoryPush) pushHangulHistoryState();
     }
 
     function closeWordSolo(skipHistoryPush) {
+      hideSoloInlineToasts();
+      selectedWordItem = null;
       currentSoloSnapshot = null;
       document.getElementById('wordSoloView').style.display = 'none';
       document.getElementById('wordListView').style.display = 'flex';
@@ -1087,26 +1565,23 @@
     }
 
     function renderWords() {
-      var q = (document.getElementById('wordSearch').value || '').trim().toLowerCase();
       var grid = document.getElementById('wordGrid');
       grid.innerHTML = '';
-      var filtered = [];
-      for (var i = 0; i < wordDatabase.length; i++) {
-        var it = wordDatabase[i];
-        if (it.cat !== currentCategory) continue;
-        if (q && it.word.toLowerCase().indexOf(q) === -1) continue;
-        filtered.push(it);
-      }
+      var filtered = getFilteredWordList();
       if (filtered.length > 0 && !selectedWordForWrite) {
         selectedWordForWrite = filtered[0].word;
         document.getElementById('topWriteLabel').textContent = selectedWordForWrite;
       }
-      document.getElementById('wordCountInfo').textContent = '총 ' + filtered.length + '개의 그림 단어 (카드를 누르면 크게 보고 소리를 들을 수 있어요)';
+      document.getElementById('wordCountInfo').textContent = '총 ' + filtered.length + '개의 그림 단어 (카드를 누르면 크게 보고 암기 체크를 할 수 있어요)';
       for (var j = 0; j < filtered.length; j++) {
         (function(item) {
+          var memoDone = isWordMemorized(item);
           var card = document.createElement('div');
-          card.className = 'word-card';
-          card.innerHTML = '<div class="word-art">' + renderArtHTML(item, false) + '</div><div class="word-text">' + item.word + '</div>';
+          card.className = 'word-card' + (memoDone ? ' is-memorized' : '');
+          card.innerHTML =
+            (memoDone ? '<span class="memo-badge">✓ 암기</span>' : '') +
+            '<div class="word-art">' + renderArtHTML(item, false) + '</div>' +
+            '<div class="word-text">' + item.word + '</div>';
           card.onclick = function() { openWordSolo(item); };
           grid.appendChild(card);
         })(filtered[j]);
@@ -1311,7 +1786,67 @@
       return res;
     }
 
+    function findExtraSoloIndex(list, item) {
+      if (!list || !item) return -1;
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].text === item.text && list[i].type === item.type) return i;
+      }
+      return -1;
+    }
+
+    function updateExtraSoloNavButtons(item) {
+      var prevBtn = document.getElementById('extraSoloPrevBtn');
+      var nextBtn = document.getElementById('extraSoloNextBtn');
+      var list = getFilteredExtraItems();
+      var idx = findExtraSoloIndex(list, item);
+
+      if (prevBtn) {
+        if (list.length <= 1) {
+          prevBtn.disabled = true;
+          prevBtn.style.opacity = '0.5';
+          prevBtn.textContent = '← 이전';
+        } else {
+          prevBtn.disabled = false;
+          prevBtn.style.opacity = '1';
+          var prevIdx = idx >= 0 ? (idx - 1 + list.length) % list.length : list.length - 1;
+          var pLabel = list[prevIdx].text.length > 7 ? list[prevIdx].text.slice(0, 7) + '…' : list[prevIdx].text;
+          prevBtn.textContent = '← 이전 (' + pLabel + ')';
+        }
+      }
+      if (nextBtn) {
+        if (list.length <= 1) {
+          nextBtn.disabled = true;
+          nextBtn.style.opacity = '0.5';
+          nextBtn.textContent = '다음 →';
+        } else {
+          nextBtn.disabled = false;
+          nextBtn.style.opacity = '1';
+          var nextIdx = idx >= 0 ? (idx + 1) % list.length : 0;
+          var nLabel = list[nextIdx].text.length > 7 ? list[nextIdx].text.slice(0, 7) + '…' : list[nextIdx].text;
+          nextBtn.textContent = '다음 (' + nLabel + ') →';
+        }
+      }
+    }
+
+    function prevExtraSolo() {
+      var list = getFilteredExtraItems();
+      if (!list || list.length === 0) return;
+      var idx = findExtraSoloIndex(list, selectedExtraItem);
+      var prevIdx = idx >= 0 ? (idx - 1 + list.length) % list.length : list.length - 1;
+      openExtraSolo(list[prevIdx]);
+    }
+
+    function nextExtraSolo() {
+      var list = getFilteredExtraItems();
+      if (!list || list.length === 0) return;
+      var idx = findExtraSoloIndex(list, selectedExtraItem);
+      var nextIdx = idx >= 0 ? (idx + 1) % list.length : 0;
+      openExtraSolo(list[nextIdx]);
+    }
+
     function openExtraSolo(item, skipHistoryPush) {
+      hideSoloInlineToasts();
+      selectedExtraItem = item;
       currentSoloSnapshot = {
         kind: 'extra',
         data: { type: item.type, topic: item.topic, text: item.text, hasBatchim: Boolean(item.hasBatchim), badge: item.badge }
@@ -1323,11 +1858,15 @@
       document.getElementById('soloExtraHint').textContent = item.hasBatchim ? '✨ 받침 글자가 들어 있어요!' : '🌱 받침 없이 또박또박 읽어요!';
       document.getElementById('soloExtraSpeakBtn').onclick = function() { speak(item.text); };
       document.getElementById('soloExtraWriteBtn').onclick = function() { previousTabId = 'tab_extra'; sendToWrite(item.text); };
+      updateSoloExtraMemoUI(item);
+      updateExtraSoloNavButtons(item);
       speak(item.text);
       if (!skipHistoryPush) pushHangulHistoryState();
     }
 
     function closeExtraSolo(skipHistoryPush) {
+      hideSoloInlineToasts();
+      selectedExtraItem = null;
       currentSoloSnapshot = null;
       document.getElementById('extraSoloView').style.display = 'none';
       document.getElementById('extraListView').style.display = 'flex';
@@ -1355,9 +1894,11 @@
 
       for (var i = 0; i < slice.length; i++) {
         (function(item) {
+          var memoDone = isExtraMemorized(item);
           var card = document.createElement('div');
-          card.className = 'sentence-card';
+          card.className = 'sentence-card' + (memoDone ? ' is-memorized' : '');
           card.innerHTML =
+            (memoDone ? '<span class="memo-badge">✓ 암기</span>' : '') +
             '<span class="sentence-badge">' + item.badge + '</span>' +
             '<div class="word-text" style="font-size:' + (item.type === 'sentence' ? '1.05rem' : '1.25rem') + ';">' + item.text + '</div>' +
             '<div class="sentence-actions">' +
@@ -1569,11 +2110,11 @@
       pickRandomWriteWord(false);
     }
 
-    // ================= 6. 한글 퀴즈 =================
+    // ================= 6. 한글 퀴즈 (그림 없이 소리만 듣고 단어 맞히기) =================
     var currentQuizAnswer = null;
     var quizLocked = false;
 
-    function nextQuiz() {
+    function nextQuiz(autoSpeak) {
       quizLocked = false;
       document.getElementById('quizFeedback').textContent = '';
       var lifeWords = [];
@@ -1582,8 +2123,6 @@
       }
       var correct = lifeWords[Math.floor(Math.random() * lifeWords.length)];
       currentQuizAnswer = correct;
-
-      document.getElementById('quizArt').innerHTML = renderArtHTML(correct, true);
 
       var opts = [correct.word];
       while (opts.length < 4) {
@@ -1606,6 +2145,10 @@
           b.onclick = function() { checkQuizAnswer(wordText, b); };
           optBox.appendChild(b);
         })(opts[k]);
+      }
+
+      if (autoSpeak) {
+        playQuizHint();
       }
     }
 
@@ -1631,12 +2174,12 @@
         updateStatsUI();
         playChime(true);
         speak('딩동댕! 정답은 ' + currentQuizAnswer.word + '이에요!');
-        setTimeout(nextQuiz, 1400);
+        setTimeout(function() { nextQuiz(true); }, 1500);
       } else {
         btnEl.style.background = '#FFE3E3';
         btnEl.style.borderColor = '#FF5E5B';
         fb.style.color = '#E03131';
-        fb.textContent = '앗, 다시 한 번 생각해 볼까요? 힌트 소리를 들어보세요!';
+        fb.textContent = '앗, 다시 한 번 생각해 볼까요? 단어 소리 듣기를 눌러보세요!';
         playChime(false);
         speak('다시 한 번 골라볼까요?');
       }
@@ -1647,6 +2190,10 @@
       document.getElementById('starCount').textContent = progress.stars || 0;
       document.getElementById('writtenCount').textContent = progress.written || 0;
       document.getElementById('quizScore').textContent = progress.quiz || 0;
+      var memoTotal = (Array.isArray(progress.memorizedWords) ? progress.memorizedWords.length : 0) +
+                      (Array.isArray(progress.memorizedExtras) ? progress.memorizedExtras.length : 0);
+      var memoEl = document.getElementById('memoTotalCount');
+      if (memoEl) memoEl.textContent = memoTotal;
       var board = document.getElementById('stickerBoard');
       if (board) {
         var list = progress.stickers || [];
@@ -1657,10 +2204,14 @@
     }
 
     function resetProgress() {
-      if (!confirm('지금까지 모은 별과 스티커 기록을 초기화할까요?')) return;
-      progress = { stars: 0, written: 0, quiz: 0, stickers: [] };
+      if (!confirm('지금까지 모은 별, 스티커, 암기 체크 기록을 초기화할까요?')) return;
+      progress = { stars: 0, written: 0, quiz: 0, stickers: [], memorizedWords: [], memorizedExtras: [] };
       saveProgress();
       updateStatsUI();
+      renderWords();
+      renderExtraItems();
+      if (selectedWordItem) updateSoloWordMemoUI(selectedWordItem);
+      if (selectedExtraItem) updateSoloExtraMemoUI(selectedExtraItem);
       showToast('기록이 초기화되었어요.');
     }
 
@@ -1685,8 +2236,9 @@
 
       if (tabId === 'tab4') {
         drawGuideText(currentWriteText);
-      } else if (tabId === 'tab5' && !currentQuizAnswer) {
-        nextQuiz();
+      } else if (tabId === 'tab5') {
+        if (!currentQuizAnswer) nextQuiz(true);
+        else playQuizHint();
       }
       if (!skipHistoryPush) pushHangulHistoryState();
     }
@@ -1698,7 +2250,7 @@
       safeRun(renderWords, 'renderWords');
       safeRun(renderExtraItems, 'renderExtraItems');
       safeRun(function() { pickRandomWriteWord(false); }, 'pickRandomWriteWord');
-      safeRun(nextQuiz, 'nextQuiz');
+      safeRun(function() { nextQuiz(false); }, 'nextQuiz');
       safeRun(updateStatsUI, 'updateStatsUI');
       safeRun(refreshVoices, 'refreshVoices');
       try {
