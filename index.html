@@ -6,7 +6,7 @@
   <title>신나는 한글 놀이터</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@300;400;500&display=swap');
-    * { box-sizing: border-box; font-family: 'Jua', sans-serif; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; font-family: 'Jua', sans-serif; -webkit-tap-highlight-color: rgba(255, 122, 0, 0.2); touch-action: manipulation; }
     html, body { margin: 0; padding: 0; background: #FFF9EC; color: #333; min-height: 100dvh; display: flex; flex-direction: column; }
 
     /* 상단 헤더 및 탭 네비게이션 */
@@ -20,6 +20,7 @@
     nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 6px 10px; background: #FFF1D0; flex-shrink: 0; }
     @media (min-width: 720px) { nav { grid-template-columns: repeat(7, 1fr); } }
     .nav-btn { background: #fff; border: 2px solid #FFD166; border-radius: 12px; padding: 6px 4px; font-size: 0.85rem; cursor: pointer; color: #444; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nav-btn:active { transform: scale(0.97); }
     .nav-btn.active { background: #FF7A00; color: #fff; border-color: #D96500; }
 
     /* 메인 영역 */
@@ -48,7 +49,7 @@
     .solo-art svg, .solo-art img { max-height: 100%; max-width: 82vw; width: auto !important; height: 100% !important; object-fit: contain; }
     .solo-word { font-size: clamp(4rem, 12vh, 6.4rem); line-height: 1.15; color: #E06000; margin-bottom: 12px; word-break: keep-all; }
 
-    /* 2. 글자 조합 (글자 크기 약 2배 확대 및 컴팩트 카드 배치) */
+    /* 2. 글자 조합 */
     .combiner-box { background: #fff; border-radius: 22px; padding: 14px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 2px solid #FFE082; display: flex; flex-direction: column; gap: 10px; }
     .combiner-top { background: #FFFDF7; border: 2px solid #FFE8B3; border-radius: 18px; padding: 14px 18px; display: flex; align-items: center; justify-content: center; gap: 22px; flex-wrap: wrap; }
     .combined-result { font-size: 7.8rem; color: #FF7A00; background: #FFF5E4; width: 210px; height: 210px; line-height: 210px; border-radius: 32px; border: 4px dashed #FF7A00; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
@@ -115,8 +116,8 @@
     <div class="header-right">
       <div class="voice-wrap">
         <select id="voiceProfileSelect" class="voice-select" onchange="changeVoiceProfile()" aria-label="목소리 선택">
-           <option value="woman">👩 여자 어른</option>
-            </select>
+          <option value="woman">👩 여자 어른</option>
+        </select>
         <span class="voice-status" id="voiceStatusLabel" title="현재 연결된 음성">음성 확인 중</span>
       </div>
       <div class="star-badge">⭐ 별: <span id="starCount">0</span>개</div>
@@ -166,7 +167,7 @@
             <div class="example-badge" id="combinedExamples">💡 들어가는 단어: 가방, 가족</div>
             <div>
               <button type="button" class="action-btn blue" onclick="speakCurrentCombined()">🔊 소리 듣기</button>
-              <button type="button" class="action-btn green" onclick="sendToWrite(document.getElementById('combinedChar').innerHTML)">✍️ 이 글자 따라 쓰기</button>
+              <button type="button" class="action-btn green" onclick="sendToWrite(document.getElementById('combinedChar').textContent)">✍️ 이 글자 따라 쓰기</button>
             </div>
           </div>
         </div>
@@ -273,7 +274,7 @@
           <button type="button" class="back-btn" onclick="goBackFromWrite()">← 뒤로</button>
           <span style="font-size:1.15rem;">연습 글자: </span>
           <strong id="targetWriteWord" style="font-size:1.85rem; color:#FF7A00; word-break:keep-all;">할아버지와 함께 화분에 물을 주어요.</strong>
-          <button type="button" class="mini-btn" onclick="speak(document.getElementById('targetWriteWord').innerHTML)">🔊 듣기</button>
+          <button type="button" class="mini-btn" onclick="speak(document.getElementById('targetWriteWord').textContent)">🔊 듣기</button>
           <button type="button" class="mini-btn" onclick="pickRandomWriteWord(true)">🎲 다른 단어</button>
         </div>
         <div class="canvas-wrap">
@@ -323,6 +324,17 @@
   <script>
     var isHandlingPopState = false;
     var currentSoloSnapshot = null;
+
+    function safeRun(fn, label) {
+      try {
+        return fn();
+      } catch (err) {
+        if (window.console && console.warn) {
+          console.warn('[HangulApp]', label || 'error', err);
+        }
+        return null;
+      }
+    }
 
     function captureHangulNavSnapshot() {
       var activeSec = document.querySelector('.section.active');
@@ -449,15 +461,15 @@
 
     var memoryStore = { stars: 0, written: 0, quiz: 0, stickers: [] };
     var progress = loadProgress();
-    var voiceProfile = 'girl';
-    var previousTabId = 'tab3';
+    var voiceProfile = 'woman';
+    var previousTabId = 'tab1';
     var cachedVoices = [];
     var toastTimer = null;
 
     function showToast(msg) {
       var el = document.getElementById('toastMsg');
       if (!el) return;
-      el.innerHTML = msg;
+      el.textContent = msg;
       el.style.display = 'block';
       if (toastTimer) clearTimeout(toastTimer);
       toastTimer = setTimeout(function() {
@@ -476,7 +488,7 @@
       var list = [];
       for (var i = 0; i < cachedVoices.length; i++) {
         var v = cachedVoices[i];
-        if (v.lang && v.lang.toLowerCase().indexOf('ko') === 0) list.push(v);
+        if (v && v.lang && v.lang.toLowerCase().indexOf('ko') === 0) list.push(v);
       }
       return list;
     }
@@ -495,15 +507,15 @@
       if (!el) return;
       var koVoices = getKoreanVoices();
       var chosen = pickBestVoice(voiceProfile);
-      var cfg = voiceConfigs[voiceProfile] || voiceConfigs.girl;
+      var cfg = voiceConfigs[voiceProfile] || voiceConfigs.woman;
       if (!('speechSynthesis' in window)) {
-        el.innerHTML = '음성 미지원';
+        el.textContent = '음성 미지원';
         return;
       }
       if (koVoices.length === 0) {
-        el.innerHTML = cfg.label + ' 톤';
+        el.textContent = cfg.label + ' 톤';
       } else {
-        el.innerHTML = chosen ? chosen.name : koVoices[0].name;
+        el.textContent = chosen ? chosen.name : koVoices[0].name;
       }
     }
 
@@ -515,7 +527,7 @@
     function pickBestVoice(profileKey) {
       var koVoices = getKoreanVoices();
       if (koVoices.length === 0) return null;
-      var cfg = voiceConfigs[profileKey] || voiceConfigs.girl;
+      var cfg = voiceConfigs[profileKey] || voiceConfigs.woman;
       for (var k = 0; k < cfg.keywords.length; k++) {
         var kw = cfg.keywords[k];
         for (var j = 0; j < koVoices.length; j++) {
@@ -523,28 +535,24 @@
           if (vn.indexOf(kw) !== -1) return koVoices[j];
         }
       }
-      if (koVoices.length >= 2 && (profileKey === 'man' || profileKey === 'boy')) {
-        for (var m = 0; m < koVoices.length; m++) {
-          var mName = (koVoices[m].name || '').toLowerCase();
-          if (mName.indexOf('male') !== -1 || mName.indexOf('minsu') !== -1 || mName.indexOf('injoon') !== -1) return koVoices[m];
-        }
-        return koVoices[koVoices.length - 1];
-      }
       return koVoices[0];
     }
 
     function changeVoiceProfile() {
       var sel = document.getElementById('voiceProfileSelect');
-      voiceProfile = sel ? sel.value : 'girl';
+      voiceProfile = sel ? sel.value : 'woman';
       updateVoiceStatusLabel();
-      var cfg = voiceConfigs[voiceProfile] || voiceConfigs.girl;
+      var cfg = voiceConfigs[voiceProfile] || voiceConfigs.woman;
       speak(cfg.sample);
     }
 
     function loadProgress() {
       try {
         var raw = window.localStorage.getItem('hangulAppCustomV1');
-        if (raw) return JSON.parse(raw);
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') return parsed;
+        }
       } catch (e) {}
       return memoryStore;
     }
@@ -577,6 +585,7 @@
     }
 
     function speak(text) {
+      if (!text) return;
       try {
         if (!('speechSynthesis' in window)) return;
         refreshVoices();
@@ -585,7 +594,7 @@
         u.lang = 'ko-KR';
         var chosen = pickBestVoice(voiceProfile);
         if (chosen) u.voice = chosen;
-        var cfg = voiceConfigs[voiceProfile] || voiceConfigs.girl;
+        var cfg = voiceConfigs[voiceProfile] || voiceConfigs.woman;
         u.rate = cfg.rate;
         u.pitch = cfg.pitch;
         setTimeout(function() {
@@ -636,8 +645,8 @@
       currentSoloSnapshot = { kind: 'letter', data: { ch: ch, desc: desc, spk: spk } };
       document.getElementById('letterListView').style.display = 'none';
       document.getElementById('letterSoloView').style.display = 'flex';
-      document.getElementById('soloLetterChar').innerHTML = ch;
-      document.getElementById('soloLetterDesc').innerHTML = desc;
+      document.getElementById('soloLetterChar').textContent = ch;
+      document.getElementById('soloLetterDesc').textContent = desc;
       document.getElementById('soloLetterSpeakBtn').onclick = function() { speak(spk); };
       document.getElementById('soloLetterWriteBtn').onclick = function() { previousTabId = 'tab1'; sendToWrite(ch); };
       speak(spk);
@@ -689,12 +698,11 @@
       }
     }
 
-    // ================= 2. 글자 조합 (실제 조합 가능한 자음·모음·받침만 선택 허용) =================
+    // ================= 2. 글자 조합 =================
     var CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
     var JUNG = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
     var JONG = ['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
 
-    // 예시 표기 없이 순수 받침 기호만 표기
     var batchimOptions = [
       { ch: '', label: '받침없음' },
       { ch: 'ㄱ', label: 'ㄱ' }, { ch: 'ㄴ', label: 'ㄴ' }, { ch: 'ㄷ', label: 'ㄷ' },
@@ -724,14 +732,12 @@
       '싫': ['싫어요', '싫다']
     };
 
-    // 실제 한국어 어휘에 쓰이는 유효 음절 집합 구축 (KS X 1001 상용 2,350자 + 학습 단어/문장 내 모든 한글 음절)
     var validSyllableSet = null;
 
     function buildValidSyllableSet() {
       if (validSyllableSet) return validSyllableSet;
       validSyllableSet = {};
 
-      // 1) 학습 DB(그림 단어, 받침 단어, 짧은 문장, 낱말 카드, 겹받침 예시)에 등장하는 모든 음절 등록
       var sources = [];
       for (var i = 0; i < wordDatabase.length; i++) sources.push(wordDatabase[i].word);
       if (typeof batchimWordsRaw !== 'undefined') {
@@ -764,7 +770,6 @@
         }
       }
 
-      // 2) 받침 없는 기본 글자(초성 19개 × 기본 모음) 및 KS X 1001 표준 완성형 한글(2,350자) 추가
       var commonVowels = ['ㅏ','ㅐ','ㅑ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
       for (var ci = 0; ci < CHO.length; ci++) {
         for (var vi = 0; vi < commonVowels.length; vi++) {
@@ -775,25 +780,10 @@
         }
       }
 
-      // 3) 자주 쓰이는 표준 받침 음절(EUC-KR 완성형 2,350자 범위 내 음절) 자동 포함
-      if (typeof TextDecoder !== 'undefined') {
-        try {
-          var decoder = new TextDecoder('euc-kr');
-          var bytes = new Uint8Array(2);
-          for (var hi = 0xB0; hi <= 0xC8; hi++) {
-            for (var lo = 0xA1; lo <= 0xFE; lo++) {
-              bytes[0] = hi;
-              bytes[1] = lo;
-              var decoded = decoder.decode(bytes);
-              if (decoded && decoded.length === 1) {
-                var uCode = decoded.charCodeAt(0);
-                if (uCode >= 0xAC00 && uCode <= 0xD7A3) {
-                  validSyllableSet[decoded] = true;
-                }
-              }
-            }
-          }
-        } catch (err) {}
+      // 겹받침이 포함된 음절들을 명시적으로 허용
+      var extraSyllables = ['값','밝','닭','삶','흙','앉','넓','읽','맑','밟','몫','많','싫','달','말','발','별','불','물','길','손','눈','산','집','책','밥','국','빵','꽃','숲','달','밤','강','콩','곰','공','칼','풀','돌','벌'];
+      for (var x = 0; x < extraSyllables.length; x++) {
+        validSyllableSet[extraSyllables[x]] = true;
       }
 
       return validSyllableSet;
@@ -838,7 +828,6 @@
       var vr = document.getElementById('combVowels');
       var br = document.getElementById('combBatchim');
 
-      // 현재 선택 조합이 유효하지 않으면 받침을 먼저 초기화하거나 유효한 모음으로 보정
       if (!isValidSyllable(selCho, selJung, selJong)) {
         if (isValidSyllable(selCho, selJung, '')) {
           selJong = '';
@@ -853,7 +842,6 @@
         }
       }
 
-      // 1단계: 첫소리 자음 버튼 상태 갱신 (현재 모음/받침 또는 기본 모음과 조합 가능한 자음만 활성)
       var cBtns = cr.querySelectorAll('.mini-btn');
       for (var i = 0; i < cBtns.length; i++) {
         var cVal = cBtns[i].getAttribute('data-val');
@@ -867,7 +855,6 @@
         cBtns[i].classList.toggle('selected', cVal === selCho);
       }
 
-      // 2단계: 모음 버튼 상태 갱신 (현재 선택된 첫소리와 조합 가능한 모음만 활성)
       var vBtns = vr.querySelectorAll('.mini-btn');
       for (var j = 0; j < vBtns.length; j++) {
         var vVal = vBtns[j].getAttribute('data-val');
@@ -876,7 +863,6 @@
         vBtns[j].classList.toggle('selected', vVal === selJung);
       }
 
-      // 3단계: 받침 버튼 상태 갱신 (현재 선택된 첫소리+모음과 조합 가능한 받침만 활성)
       var bBtns = br.querySelectorAll('.mini-btn');
       for (var m = 0; m < bBtns.length; m++) {
         var bVal = bBtns[m].getAttribute('data-val');
@@ -899,7 +885,7 @@
           b.type = 'button';
           b.className = 'mini-btn' + (c.ch === selCho ? ' selected' : '');
           b.setAttribute('data-val', c.ch);
-          b.innerHTML = c.ch;
+          b.textContent = c.ch;
           b.onclick = function() {
             if (b.disabled) return;
             selCho = c.ch;
@@ -928,7 +914,7 @@
           b.type = 'button';
           b.className = 'mini-btn' + (v.ch === selJung ? ' selected' : '');
           b.setAttribute('data-val', v.ch);
-          b.innerHTML = v.ch;
+          b.textContent = v.ch;
           b.onclick = function() {
             if (b.disabled) return;
             selJung = v.ch;
@@ -947,7 +933,7 @@
           b.type = 'button';
           b.className = 'mini-btn batchim-btn' + (bt.ch === selJong ? ' selected' : '');
           b.setAttribute('data-val', bt.ch);
-          b.innerHTML = bt.label;
+          b.textContent = bt.label;
           b.onclick = function() {
             if (b.disabled) return;
             selJong = bt.ch;
@@ -970,12 +956,12 @@
       if (ci < 0 || ji < 0 || ki < 0) return;
 
       var ch = String.fromCharCode(0xAC00 + (ci * 21 * 28) + (ji * 28) + ki);
-      document.getElementById('combinedChar').innerHTML = ch;
+      document.getElementById('combinedChar').textContent = ch;
 
       var exWords = findExampleWordsForChar(ch);
       var badgeEl = document.getElementById('combinedExamples');
       if (badgeEl) {
-        badgeEl.innerHTML = exWords.length > 0
+        badgeEl.textContent = exWords.length > 0
           ? '💡 들어가는 단어: ' + exWords.join(', ')
           : '💡 조합된 글자: ' + ch;
       }
@@ -989,7 +975,7 @@
       }
     }
 
-    function speakCurrentCombined() { speak(document.getElementById('combinedChar').innerHTML); }
+    function speakCurrentCombined() { speak(document.getElementById('combinedChar').textContent); }
 
     function createCharacterSVG(item, sizePx) {
       var sz = sizePx || 116;
@@ -1043,7 +1029,7 @@
           : '';
         var onErr = fallback
           ? "this.onerror=null;this.src='" + fallback + "';"
-          : "this.onerror=null;this.outerHTML='<div class="word-emoji">' + " + JSON.stringify(item.emoji || '✨') + " + '</div>';";
+          : "this.onerror=null;this.outerHTML='<div class=\"word-emoji\">' + " + JSON.stringify(item.emoji || '✨') + " + '</div>';";
         return '<img src="' + item.img + '" alt="' + item.word + '" loading="lazy" onerror="' + onErr + '" style="width:' + sz + 'px;height:' + sz + 'px;object-fit:contain;border-radius:14px;">';
       }
       if (item.cat === 'carbot' || item.cat === 'metalcardbot' || item.cat === 'pokemon') {
@@ -1082,11 +1068,11 @@
     function openWordSolo(item, skipHistoryPush) {
       currentSoloSnapshot = { kind: 'word', data: { word: item.word, cat: item.cat, emoji: item.emoji || '', img: item.img || '' } };
       selectedWordForWrite = item.word;
-      document.getElementById('topWriteLabel').innerHTML = item.word;
+      document.getElementById('topWriteLabel').textContent = item.word;
       document.getElementById('wordListView').style.display = 'none';
       document.getElementById('wordSoloView').style.display = 'flex';
       document.getElementById('soloWordArt').innerHTML = renderArtHTML(item, true);
-      document.getElementById('soloWordText').innerHTML = item.word;
+      document.getElementById('soloWordText').textContent = item.word;
       document.getElementById('soloWordSpeakBtn').onclick = function() { speak(item.word); };
       document.getElementById('soloWordWriteBtn').onclick = function() { previousTabId = 'tab3'; sendToWrite(item.word); };
       speak(item.word);
@@ -1113,9 +1099,9 @@
       }
       if (filtered.length > 0 && !selectedWordForWrite) {
         selectedWordForWrite = filtered[0].word;
-        document.getElementById('topWriteLabel').innerHTML = selectedWordForWrite;
+        document.getElementById('topWriteLabel').textContent = selectedWordForWrite;
       }
-      document.getElementById('wordCountInfo').innerHTML = '총 ' + filtered.length + '개의 그림 단어 (카드를 누르면 크게 보고 소리를 들을 수 있어요)';
+      document.getElementById('wordCountInfo').textContent = '총 ' + filtered.length + '개의 그림 단어 (카드를 누르면 크게 보고 소리를 들을 수 있어요)';
       for (var j = 0; j < filtered.length; j++) {
         (function(item) {
           var card = document.createElement('div');
@@ -1127,7 +1113,7 @@
       }
     }
 
-    // ================= 4. 받침·문장 데이터베이스 (짧은 문장 320개 + 받침 단어 + 낱말 카드) =================
+    // ================= 4. 받침·문장 데이터베이스 =================
     var shortSentencesByTopic = {
       '가족/인사': [
         '안녕하세요, 반갑습니다.', '좋은 아침이에요!', '잘 잤어요? 기분 좋은 하루예요.', '안녕히 주무세요, 사랑해요.',
@@ -1332,9 +1318,9 @@
       };
       document.getElementById('extraListView').style.display = 'none';
       document.getElementById('extraSoloView').style.display = 'flex';
-      document.getElementById('soloExtraBadge').innerHTML = item.badge;
-      document.getElementById('soloExtraText').innerHTML = item.text;
-      document.getElementById('soloExtraHint').innerHTML = item.hasBatchim ? '✨ 받침 글자가 들어 있어요!' : '🌱 받침 없이 또박또박 읽어요!';
+      document.getElementById('soloExtraBadge').textContent = item.badge;
+      document.getElementById('soloExtraText').textContent = item.text;
+      document.getElementById('soloExtraHint').textContent = item.hasBatchim ? '✨ 받침 글자가 들어 있어요!' : '🌱 받침 없이 또박또박 읽어요!';
       document.getElementById('soloExtraSpeakBtn').onclick = function() { speak(item.text); };
       document.getElementById('soloExtraWriteBtn').onclick = function() { previousTabId = 'tab_extra'; sendToWrite(item.text); };
       speak(item.text);
@@ -1363,7 +1349,7 @@
       var start = (extraPage - 1) * EXTRA_PAGE_SIZE;
       var slice = list.slice(start, start + EXTRA_PAGE_SIZE);
 
-      document.getElementById('extraCountInfo').innerHTML = '총 ' + total + '개 항목 (' + extraPage + ' / ' + totalPages + ' 페이지)';
+      document.getElementById('extraCountInfo').textContent = '총 ' + total + '개 항목 (' + extraPage + ' / ' + totalPages + ' 페이지)';
       var grid = document.getElementById('extraGrid');
       grid.innerHTML = '';
 
@@ -1393,38 +1379,38 @@
         var prevBtn = document.createElement('button');
         prevBtn.type = 'button';
         prevBtn.className = 'mini-btn';
-        prevBtn.innerHTML = '◀ 이전';
+        prevBtn.textContent = '◀ 이전';
         prevBtn.disabled = (extraPage <= 1);
         prevBtn.onclick = function() { if (extraPage > 1) { extraPage--; renderExtraItems(); } };
         pag.appendChild(prevBtn);
 
         var infoSpan = document.createElement('span');
         infoSpan.style.fontSize = '0.95rem';
-        infoSpan.innerHTML = extraPage + ' / ' + totalPages;
+        infoSpan.textContent = extraPage + ' / ' + totalPages;
         pag.appendChild(infoSpan);
 
         var nextBtn = document.createElement('button');
         nextBtn.type = 'button';
         nextBtn.className = 'mini-btn';
-        nextBtn.innerHTML = '다음 ▶';
+        nextBtn.textContent = '다음 ▶';
         nextBtn.disabled = (extraPage >= totalPages);
         nextBtn.onclick = function() { if (extraPage < totalPages) { extraPage++; renderExtraItems(); } };
         pag.appendChild(nextBtn);
       }
     }
 
-    // ================= 5. 따라 쓰기 (2줄 자동 줄바꿈 + 캔버스 그리기 완료 시 별 버튼 활성) =================
+    // ================= 5. 따라 쓰기 =================
     var canvas = document.getElementById('writeCanvas');
-    var ctx = canvas.getContext('2d');
+    var ctx = canvas ? canvas.getContext('2d') : null;
     var isDrawing = false;
     var hasDrawnStroke = false;
     var currentWriteText = '가나다';
 
     function drawGuideText(text) {
+      if (!canvas || !ctx) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
 
-      // 안내 점선 가이드라인
       ctx.strokeStyle = '#E2F3F0';
       ctx.lineWidth = 2;
       ctx.setLineDash([8, 8]);
@@ -1434,7 +1420,6 @@
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // 긴 문장/단어는 2줄로 자동 분할
       var lines = [text];
       if (text.length >= 9) {
         var mid = Math.floor(text.length / 2);
@@ -1491,7 +1476,7 @@
     function sendToWrite(text) {
       if (!text) text = '가나다';
       currentWriteText = text;
-      document.getElementById('targetWriteWord').innerHTML = text;
+      document.getElementById('targetWriteWord').textContent = text;
       var tab4Btn = document.querySelectorAll('#mainNav .nav-btn')[4];
       showTab('tab4', tab4Btn, true, false);
       clearCanvas();
@@ -1499,9 +1484,9 @@
     }
 
     function goBackFromWrite() {
-      var target = previousTabId || 'tab3';
+      var target = previousTabId || 'tab1';
       var map = { tab1: 0, tab2: 1, tab3: 2, tab_extra: 3, tab4: 4, tab5: 5, tab6: 6 };
-      var idx = (map[target] !== undefined) ? map[target] : 2;
+      var idx = (map[target] !== undefined) ? map[target] : 0;
       var btn = document.querySelectorAll('#mainNav .nav-btn')[idx];
       showTab(target, btn);
     }
@@ -1513,22 +1498,23 @@
       }
       var chosen = pool[Math.floor(Math.random() * pool.length)] || '사과';
       currentWriteText = chosen;
-      document.getElementById('targetWriteWord').innerHTML = chosen;
+      document.getElementById('targetWriteWord').textContent = chosen;
       clearCanvas();
       if (shouldSpeak) speak(chosen);
     }
 
     function getCanvasPos(e) {
       var rect = canvas.getBoundingClientRect();
-      var clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      var clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
+      var clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
       return {
-        x: (clientX - rect.left) * (canvas.width / rect.width),
-        y: (clientY - rect.top) * (canvas.height / rect.height)
+        x: (clientX - rect.left) * (canvas.width / Math.max(1, rect.width)),
+        y: (clientY - rect.top) * (canvas.height / Math.max(1, rect.height))
       };
     }
 
     function startDraw(e) {
+      if (!ctx) return;
       e.preventDefault();
       isDrawing = true;
       var pos = getCanvasPos(e);
@@ -1541,7 +1527,7 @@
     }
 
     function moveDraw(e) {
-      if (!isDrawing) return;
+      if (!isDrawing || !ctx) return;
       e.preventDefault();
       var pos = getCanvasPos(e);
       ctx.lineTo(pos.x, pos.y);
@@ -1557,12 +1543,14 @@
       isDrawing = false;
     }
 
-    canvas.addEventListener('mousedown', startDraw);
-    canvas.addEventListener('mousemove', moveDraw);
-    window.addEventListener('mouseup', endDraw);
-    canvas.addEventListener('touchstart', startDraw, { passive: false });
-    canvas.addEventListener('touchmove', moveDraw, { passive: false });
-    window.addEventListener('touchend', endDraw);
+    if (canvas) {
+      canvas.addEventListener('mousedown', startDraw);
+      canvas.addEventListener('mousemove', moveDraw);
+      window.addEventListener('mouseup', endDraw);
+      canvas.addEventListener('touchstart', startDraw, { passive: false });
+      canvas.addEventListener('touchmove', moveDraw, { passive: false });
+      window.addEventListener('touchend', endDraw);
+    }
 
     var stickerRewards = ['⭐','🌟','🎖️','🏆','👑','🦄','🚀','🌈','🍓','🐶','🐱','🤖','⚡','🎨','🎈','🍀'];
 
@@ -1587,7 +1575,7 @@
 
     function nextQuiz() {
       quizLocked = false;
-      document.getElementById('quizFeedback').innerHTML = '';
+      document.getElementById('quizFeedback').textContent = '';
       var lifeWords = [];
       for (var i = 0; i < wordDatabase.length; i++) {
         if (wordDatabase[i].cat === 'life') lifeWords.push(wordDatabase[i]);
@@ -1614,7 +1602,7 @@
           var b = document.createElement('button');
           b.type = 'button';
           b.className = 'quiz-opt-btn';
-          b.innerHTML = wordText;
+          b.textContent = wordText;
           b.onclick = function() { checkQuizAnswer(wordText, b); };
           optBox.appendChild(b);
         })(opts[k]);
@@ -1634,7 +1622,7 @@
         btnEl.style.color = '#fff';
         btnEl.style.borderColor = '#1F8E83';
         fb.style.color = '#1F8E83';
-        fb.innerHTML = '🎉 정답이에요! "' + currentQuizAnswer.word + '" (+별 1개)';
+        fb.textContent = '🎉 정답이에요! "' + currentQuizAnswer.word + '" (+별 1개)';
         progress.stars = (progress.stars || 0) + 1;
         progress.quiz = (progress.quiz || 0) + 1;
         if (!progress.stickers) progress.stickers = [];
@@ -1648,7 +1636,7 @@
         btnEl.style.background = '#FFE3E3';
         btnEl.style.borderColor = '#FF5E5B';
         fb.style.color = '#E03131';
-        fb.innerHTML = '앗, 다시 한 번 생각해 볼까요? 힌트 소리를 들어보세요!';
+        fb.textContent = '앗, 다시 한 번 생각해 볼까요? 힌트 소리를 들어보세요!';
         playChime(false);
         speak('다시 한 번 골라볼까요?');
       }
@@ -1656,9 +1644,9 @@
 
     // ================= 7. 나의 공부방 & 탭 전환 =================
     function updateStatsUI() {
-      document.getElementById('starCount').innerHTML = progress.stars || 0;
-      document.getElementById('writtenCount').innerHTML = progress.written || 0;
-      document.getElementById('quizScore').innerHTML = progress.quiz || 0;
+      document.getElementById('starCount').textContent = progress.stars || 0;
+      document.getElementById('writtenCount').textContent = progress.written || 0;
+      document.getElementById('quizScore').textContent = progress.quiz || 0;
       var board = document.getElementById('stickerBoard');
       if (board) {
         var list = progress.stickers || [];
@@ -1687,8 +1675,13 @@
       if (target) target.classList.add('active');
 
       var navBtns = document.querySelectorAll('#mainNav .nav-btn');
+      var map = { tab1: 0, tab2: 1, tab3: 2, tab_extra: 3, tab4: 4, tab5: 5, tab6: 6 };
       for (var j = 0; j < navBtns.length; j++) navBtns[j].classList.remove('active');
-      if (btn) btn.classList.add('active');
+      if (btn) {
+        btn.classList.add('active');
+      } else if (map[tabId] !== undefined && navBtns[map[tabId]]) {
+        navBtns[map[tabId]].classList.add('active');
+      }
 
       if (tabId === 'tab4') {
         drawGuideText(currentWriteText);
@@ -1698,17 +1691,16 @@
       if (!skipHistoryPush) pushHangulHistoryState();
     }
 
-    // 앱 초기 구동
-    window.addEventListener('DOMContentLoaded', function() {
-      initLetters();
-      initExtraData();
-      initCombiner();
-      renderWords();
-      renderExtraItems();
-      pickRandomWriteWord(false);
-      nextQuiz();
-      updateStatsUI();
-      refreshVoices();
+    function bootHangulApp() {
+      safeRun(initLetters, 'initLetters');
+      safeRun(initExtraData, 'initExtraData');
+      safeRun(initCombiner, 'initCombiner');
+      safeRun(renderWords, 'renderWords');
+      safeRun(renderExtraItems, 'renderExtraItems');
+      safeRun(function() { pickRandomWriteWord(false); }, 'pickRandomWriteWord');
+      safeRun(nextQuiz, 'nextQuiz');
+      safeRun(updateStatsUI, 'updateStatsUI');
+      safeRun(refreshVoices, 'refreshVoices');
       try {
         if (window.history && typeof window.history.replaceState === 'function') {
           window.history.replaceState({
@@ -1717,7 +1709,13 @@
           }, '', window.location.href);
         }
       } catch (e) {}
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', bootHangulApp);
+    } else {
+      bootHangulApp();
+    }
   </script>
 </body>
 </html>
